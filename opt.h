@@ -28,7 +28,7 @@
 	<br/><br/>
 	The following presents a simple example of using these optimizers.
 	<br/>
-	\include main.cpp
+	\include maintest.cpp
 	<br/><br/>
 	This program will output the following:
 	<br/>
