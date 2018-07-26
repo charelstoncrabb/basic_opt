@@ -1,0 +1,145 @@
+\hypertarget{namespaceopt}{}\section{opt Namespace Reference}
+\label{namespaceopt}\index{opt@{opt}}
+
+
+Optimization namespace containing various optimization algorithms.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \mbox{\hyperlink{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}{gradient\+Descent}} (std\+::function$<$ double(double)$>$f, double \&x0, double tol=1.e-\/6, bool verbose=true)
+\begin{DoxyCompactList}\small\item\em Compute a local minimum near initial guess of real-\/valued function. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{gradient\+Descent\+\_\+\+Xd}} (std\+::function$<$ double(std\+::vector$<$ double $>$)$>$f, std\+::vector$<$ double $>$ \&x0, double tol=1.e-\/6, bool verbose=true)
+\begin{DoxyCompactList}\small\item\em Compute a local minimum near initial guess of real-\/valued function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Optimization namespace containing various optimization algorithms. 
+
+Currently implemented are the basic Barzilai-\/\+Borwein gradient descent methods ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for both scalar-\/valued functions of a single variable $f:R\longrightarrow R$ as well as scalar-\/valued functions of $d$ variables $ f:R^d\longrightarrow R$. ~\newline
+~\newline
+ The basic algorithm implements the following iterative method\+: \[ x_{n+1}=x_n-\gamma_n\nabla f(x_n), \] where \[ \gamma_n=\frac{(x_n-x_{n-1})\cdot\left[\nabla f(x_n)-\nabla f(x_{n-1})\right]}{\left|\nabla f(x_n)-\nabla f(x_{n-1})\right|^2} \] and $\nabla f$ is approximated with a simple finite-\/difference method using $\Delta x=\min(tol/10,\gamma_n/10)$, where $tol$ is a provided convergence tolerance. ~\newline
+~\newline
+ For functions of $d$ variables, a {\bfseries std\+::vector$<$double$>$} container is assumed as the vector argument. ~\newline
+~\newline
+ The following presents a simple example of using these optimizers. ~\newline
+ 
+\begin{DoxyCodeInclude}
+\textcolor{preprocessor}{#include <vector>}
+\textcolor{preprocessor}{#include <iostream>}
+\textcolor{preprocessor}{#include "opt.h"}
+
+\textcolor{comment}{// Single-variable f(x) = x^2}
+\textcolor{keywordtype}{double} x2(\textcolor{keywordtype}{double} x)
+\{
+    \textcolor{keywordflow}{return} x * x;
+\}
+
+\textcolor{comment}{// Multi-variate f(x) = |x|^2}
+\textcolor{keywordtype}{double} x2\_Xd(std::vector<double> x)
+\{
+    \textcolor{keywordtype}{size\_t} N = x.size();
+    \textcolor{keywordtype}{double} ans = 0.0;
+    \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < N; i++)
+        ans += x[i] * x[i];
+    \textcolor{keywordflow}{return} ans;
+\}
+
+\textcolor{keywordtype}{int} main()
+\{
+    \textcolor{comment}{// Single-variable problem parameters:}
+    \textcolor{keywordtype}{double} x0 = 8.;
+    \textcolor{keywordtype}{double} x0\_init = x0;
+
+    \textcolor{comment}{// Call the single-variable gradient descent optimizer on the x^2 function:}
+    \textcolor{keywordtype}{double} gdval = \mbox{\hyperlink{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}{opt::gradientDescent}}(x2, x0);
+
+    \textcolor{comment}{// Output results:}
+    std::cout << \textcolor{stringliteral}{"Solution for min val of f(x) = x^2 with guess x0 = "} << x0\_init << \textcolor{stringliteral}{":"} << std::endl;
+    std::cout <<  \textcolor{stringliteral}{"\(\backslash\)tMinimum = "} << gdval << \textcolor{stringliteral}{", x\_min = "} << x0 << std::endl;
+
+    std::cout << std::endl;
+
+    \textcolor{comment}{// Multi-variable problem parameters:}
+    std::vector<double> X0 = \{ 4.,4. \};
+    std::vector<double> X0\_init = X0;
+
+    \textcolor{comment}{// Call the multi-variable gradient descent optimier on the |x|^2 function:}
+    gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(x2\_Xd, X0);
+
+    \textcolor{comment}{// Output results:}
+    std::cout << \textcolor{stringliteral}{"Solution for min val of f(x) = |x|^2 with guess X0 = ["} << X0\_init[0] << \textcolor{stringliteral}{", "} << X0\_init[
+      1] << \textcolor{stringliteral}{"]:"} << std::endl;
+    std::cout << \textcolor{stringliteral}{"\(\backslash\)tMinimum = "} << gdval << \textcolor{stringliteral}{", x\_min = ["} << X0[0] << \textcolor{stringliteral}{", "} << X0[1] << \textcolor{stringliteral}{"]"} << std::endl;
+
+    std::cin.get();
+    \textcolor{keywordflow}{return} 0;
+\}
+\end{DoxyCodeInclude}
+ ~\newline
+~\newline
+ This program will output the following\+: ~\newline
+ 
+\begin{DoxyCode}
+Minimum converged in 2 iterations
+Solution for min val of f(x) = x^2 with guess x0 = 8:
+    Minimum = 2.5e-15, x\_min = -5e-08
+
+Minimum converged in 2 iterations
+Solution for min val of f(x) = |x|^2 with guess X0 = [4, 4]:
+    Minimum = 5e-15, x\_min = [-5e-08, -5e-08]
+\end{DoxyCode}
+ \begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Up next\+: gradient\+Descent\+\_\+\+X\+Xd() -- gradient descent method for linear systems $Ax=b$ \end{DoxyRefDesc}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}\label{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}} 
+\index{opt@{opt}!gradient\+Descent@{gradient\+Descent}}
+\index{gradient\+Descent@{gradient\+Descent}!opt@{opt}}
+\subsubsection{\texorpdfstring{gradient\+Descent()}{gradientDescent()}}
+{\footnotesize\ttfamily double opt\+::gradient\+Descent (\begin{DoxyParamCaption}\item[{std\+::function$<$ double(double)$>$}]{f,  }\item[{double \&}]{x0,  }\item[{double}]{tol = {\ttfamily 1.e-\/6},  }\item[{bool}]{verbose = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Compute a local minimum near initial guess of real-\/valued function. 
+
+This function implements the Barzilai-\/\+Borwein gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for a general single variable real-\/valued function. 
+\begin{DoxyParams}{Parameters}
+{\em f} & {\bfseries (std\+::function$<$double(double)$>$)} real-\/valued function $f:R\longrightarrow R$ to find the local minimum nearest initial guess $x_0$ \\
+\hline
+{\em x0} & {\bfseries (double\&)} Initial guess of gradient descent optimization problem; this parameter is updated with the optimized $x-$value prior to exiting. \\
+\hline
+{\em tol} & {\bfseries (double)} by default 1.\+0e-\/6, the convergence criterion for error in the function evaluations \\
+\hline
+{\em verbose} & {\bfseries (bool)} by default true, if set to true then the optimizer will echo to stdout number of iterations performed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$f(x_n)$ {\bfseries (double)} local minimum of $f$ in well of $x_0$ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}\label{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}} 
+\index{opt@{opt}!gradient\+Descent\+\_\+\+Xd@{gradient\+Descent\+\_\+\+Xd}}
+\index{gradient\+Descent\+\_\+\+Xd@{gradient\+Descent\+\_\+\+Xd}!opt@{opt}}
+\subsubsection{\texorpdfstring{gradient\+Descent\+\_\+\+Xd()}{gradientDescent\_Xd()}}
+{\footnotesize\ttfamily double opt\+::gradient\+Descent\+\_\+\+Xd (\begin{DoxyParamCaption}\item[{std\+::function$<$ double(std\+::vector$<$ double $>$)$>$}]{f,  }\item[{std\+::vector$<$ double $>$ \&}]{x0,  }\item[{double}]{tol = {\ttfamily 1.e-\/6},  }\item[{bool}]{verbose = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Compute a local minimum near initial guess of real-\/valued function. 
+
+This function implements the Barzilai-\/\+Borwein gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for a general multi-\/variate real-\/valued function. 
+\begin{DoxyParams}{Parameters}
+{\em f} & {\bfseries (std\+::function$<$double(std\+::vector$<$double$>$)$>$)} real-\/valued function $ f:R^d\longrightarrow R$ to find the local minimum nearest initial guess $x_0$ \\
+\hline
+{\em x0} & {\bfseries (double\&)} Initial guess of gradient descent optimization problem; this parameter is updated with the optimized $x-$value prior to exiting. \\
+\hline
+{\em tol} & {\bfseries (double)} by default 1.\+0e-\/6, the convergence criterion for error in the function evaluations \\
+\hline
+{\em verbose} & {\bfseries (bool)} by default true, if set to true then the optimizer will echo to stdout number of iterations performed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$f(x_n)$ {\bfseries (double)} local minimum of $f$ in well of $x_0$ 
+\end{DoxyReturn}
