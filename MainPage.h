@@ -6,7 +6,7 @@
  <br/>
  The current user-interface is through a single header file opt.h.  
  <br/>
- The optimization functions are within in the <A HREF="https://charelstoncrabb.github.io/basic_opt/html/namespaceopt.html">opt</A> namespace.
+ The optimization functions are within the <A HREF="https://charelstoncrabb.github.io/basic_opt/html/namespaceopt.html">opt</A> namespace.
  <br/>
  Currently implemented is a simple <A HREF="https://en.wikipedia.org/wiki/Gradient_descent">gradient descent method</A> for single- or multi-variate functions.
  <br/>
