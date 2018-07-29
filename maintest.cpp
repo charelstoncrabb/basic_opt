@@ -37,7 +37,7 @@ int main()
 	std::vector<double> X0 = { 4.,4. };
 	std::vector<double> X0_init = X0;
 
-	// Call the multi-variable gradient descent optimier on the |x|^2 function:
+	// Call the multi-variable gradient descent optimizer on the |x|^2 function:
 	gdval = opt::gradientDescent_Xd(x2_Xd, X0);
 
 	// Output results:
