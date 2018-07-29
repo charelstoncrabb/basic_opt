@@ -91,7 +91,7 @@ Currently implemented are the basic Barzilai-\/\+Borwein gradient descent method
     X0\_init = X0;
 
     \textcolor{comment}{/*** Call the multi-variable gradient descent optimizer on the Rosenbrock function: ***/}
-    gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(rosenbrock, X0);
+    gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(rosenbrock, X0, 1.e-10);
 
     \textcolor{comment}{// Output results:}
     std::cout << \textcolor{stringliteral}{"Solution for min val of rosenbrock(x) with initial guess X0 = ["} << X0\_init[0] << \textcolor{stringliteral}{", "} <<
@@ -108,15 +108,15 @@ Currently implemented are the basic Barzilai-\/\+Borwein gradient descent method
 \begin{DoxyCode}
 Minimum converged in 2 iterations
 Solution for min val of f(x) = x^2 with initial guess x0 = 8:
-    Minimum = 2.5e-15, x\_min = -5e-08
+        Minimum = 2.5e-15, x\_min = -5e-08
 
 Minimum converged in 2 iterations
 Solution for min val of f(x) = |x|^2 with initial guess X0 = [4, 4]:
-    Minimum = 5e-15, x\_min = [-5e-08, -5e-08]
+        Minimum = 5e-15, x\_min = [-5e-08, -5e-08]
 
-Minimum converged in 38 iterations
+Minimum converged in 51 iterations
 Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
-    Minimum = 5.50167e-05, x\_min = [0.992589, 0.985202]
+        Minimum = 4.72937e-10, x\_min = [0.999978, 0.999956]
 \end{DoxyCode}
  \begin{DoxyRefDesc}{Todo}
 \item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Up next\+: gradient\+Descent\+\_\+\+X\+Xd() -- gradient descent method for over-\/determined linear systems $Ax=b$ \end{DoxyRefDesc}

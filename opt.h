@@ -36,15 +36,16 @@
 	\code{.unparsed}
 	Minimum converged in 2 iterations
 	Solution for min val of f(x) = x^2 with initial guess x0 = 8:
-		Minimum = 2.5e-15, x_min = -5e-08
+			Minimum = 2.5e-15, x_min = -5e-08
 
 	Minimum converged in 2 iterations
 	Solution for min val of f(x) = |x|^2 with initial guess X0 = [4, 4]:
-		Minimum = 5e-15, x_min = [-5e-08, -5e-08]
+			Minimum = 5e-15, x_min = [-5e-08, -5e-08]
 
-	Minimum converged in 38 iterations
+	Minimum converged in 51 iterations
 	Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
-		Minimum = 5.50167e-05, x_min = [0.992589, 0.985202]
+			Minimum = 4.72937e-10, x_min = [0.999978, 0.999956]
+
 	\endcode
 	\todo Up next: gradientDescent_XXd() -- gradient descent method for over-determined linear systems \f$Ax=b\f$
 */

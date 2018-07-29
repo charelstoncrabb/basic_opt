@@ -61,7 +61,7 @@ int main()
 	X0_init = X0;
 
 	/*** Call the multi-variable gradient descent optimizer on the Rosenbrock function: ***/
-	gdval = opt::gradientDescent_Xd(rosenbrock, X0);
+	gdval = opt::gradientDescent_Xd(rosenbrock, X0, 1.e-10);
 
 	// Output results:
 	std::cout << "Solution for min val of rosenbrock(x) with initial guess X0 = [" << X0_init[0] << ", " << X0_init[1] << "]:" << std::endl;
