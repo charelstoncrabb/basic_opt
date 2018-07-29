@@ -42,12 +42,12 @@
 	Solution for min val of f(x) = |x|^2 with initial guess X0 = [4, 4]:
 			Minimum = 5e-15, x_min = [-5e-08, -5e-08]
 
-	Minimum converged in 51 iterations
+	Minimum converged in 55 iterations
 	Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
-			Minimum = 4.72937e-10, x_min = [0.999978, 0.999956]
+        Minimum = 9.83781e-11, x_min = [1, 1]
 
 	\endcode
-	\todo Up next: gradientDescent_XXd() -- gradient descent method for over-determined linear systems \f$Ax=b\f$
+	\todo Up next: conjGradientDescent_XXd() -- conjugate gradient descent method for symmetric positive-definite systems \f$Ax=b\f$
 */
 namespace opt {
 
@@ -108,7 +108,7 @@ namespace opt {
 	This function implements the Barzilai-Borwein gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) for a general single variable real-valued function.
 	\param f <b>(std::function<double(double)>)</b> real-valued function \f$f:R\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$. \f$f\f$ is a function that has <b>double</b> arg type, and <b>double</b> as return type.
 	\param x0 <b>(double&)</b> Initial guess of gradient descent optimization problem; this parameter is updated with the optimized \f$x-\f$value prior to exiting.
-	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for error in the function evaluations
+	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for function derivative magnitude
 	\param verbose <b>(bool)</b> by default true, if set to true then the optimizer will echo to stdout number of iterations performed
 	\return \f$f(x_{opt})\f$ <b>(double)</b> local minimum of \f$f\f$ in well of \f$x_0\f$
 	*/
@@ -134,7 +134,7 @@ namespace opt {
 			x_n = x_np1;								// Update x_n with new x_{n+1}
 			dx = fmin(tol / 10., gamma_n/10.);			// Update dx based on new spatial step value
 
-			error = fabs(f(x_n) - f(x_nm1));			// Update error based on new function evaluations
+			error = fabs(df_n);							// Update error based on new function evaluations
 			iterations++;								// Increment algorithm iteration count
 		}
 		if( verbose ) std::cout << "Minimum converged in " << iterations << " iterations" << std::endl;
@@ -147,7 +147,7 @@ namespace opt {
 	This function implements the Barzilai-Borwein gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) for a general multi-variate real-valued function.
 	\param f <b>(std::function<double(std::vector<double>)>)</b> real-valued function \f$ f:R^d\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$. \f$f\f$ is a function that has <b>std::vector<double></b> arg type, and <b>double</b> as return type.
 	\param x0 <b>(double&)</b> Initial guess of gradient descent optimization problem; this parameter is updated with the optimized \f$x-\f$value prior to exiting.
-	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for error in the function evaluations
+	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for function gradient magnitude
 	\param verbose <b>(bool)</b> by default true, if set to true then the optimizer will echo to stdout number of iterations performed
 	\return \f$f(x_{opt})\f$ <b>(double)</b> local minimum of \f$f\f$ in well of \f$x_0\f$
 	*/
@@ -179,7 +179,7 @@ namespace opt {
 			x_n = x_np1;									// Update x_n with new x_{n+1}
 			dx = fmin(tol / 10., gamma_n/10.);				// Update dx based on new spatial step value
 
-			error = fabs(f(x_n) - f(x_nm1));				// Update error based on new function evaluations
+			error = fabs(__helpers::vectDot(df_n, df_n));	// Update error based on new function evaluations
 			iterations++;									// Increment algorithm iteration count
 		}
 		if( verbose ) std::cout << "Minimum converged in " << iterations << " iterations" << std::endl;

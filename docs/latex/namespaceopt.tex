@@ -114,12 +114,12 @@ Minimum converged in 2 iterations
 Solution for min val of f(x) = |x|^2 with initial guess X0 = [4, 4]:
         Minimum = 5e-15, x\_min = [-5e-08, -5e-08]
 
-Minimum converged in 51 iterations
+Minimum converged in 55 iterations
 Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
-        Minimum = 4.72937e-10, x\_min = [0.999978, 0.999956]
+    Minimum = 9.83781e-11, x\_min = [1, 1]
 \end{DoxyCode}
  \begin{DoxyRefDesc}{Todo}
-\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Up next\+: gradient\+Descent\+\_\+\+X\+Xd() -- gradient descent method for over-\/determined linear systems $Ax=b$ \end{DoxyRefDesc}
+\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Up next\+: conj\+Gradient\+Descent\+\_\+\+X\+Xd() -- conjugate gradient descent method for symmetric positive-\/definite systems $Ax=b$ \end{DoxyRefDesc}
 
 
 \subsection{Function Documentation}
@@ -139,7 +139,7 @@ This function implements the Barzilai-\/\+Borwein gradient descent method ({\its
 \hline
 {\em x0} & {\bfseries (double\&)} Initial guess of gradient descent optimization problem; this parameter is updated with the optimized $x-$value prior to exiting. \\
 \hline
-{\em tol} & {\bfseries (double)} by default 1.\+0e-\/6, the convergence criterion for error in the function evaluations \\
+{\em tol} & {\bfseries (double)} by default 1.\+0e-\/6, the convergence criterion for function derivative magnitude \\
 \hline
 {\em verbose} & {\bfseries (bool)} by default true, if set to true then the optimizer will echo to stdout number of iterations performed \\
 \hline
@@ -163,7 +163,7 @@ This function implements the Barzilai-\/\+Borwein gradient descent method ({\its
 \hline
 {\em x0} & {\bfseries (double\&)} Initial guess of gradient descent optimization problem; this parameter is updated with the optimized $x-$value prior to exiting. \\
 \hline
-{\em tol} & {\bfseries (double)} by default 1.\+0e-\/6, the convergence criterion for error in the function evaluations \\
+{\em tol} & {\bfseries (double)} by default 1.\+0e-\/6, the convergence criterion for function gradient magnitude \\
 \hline
 {\em verbose} & {\bfseries (bool)} by default true, if set to true then the optimizer will echo to stdout number of iterations performed \\
 \hline
