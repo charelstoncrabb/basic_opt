@@ -28,6 +28,7 @@ Currently implemented are the basic Barzilai-\/\+Borwein gradient descent method
 \begin{DoxyCodeInclude}
 \textcolor{preprocessor}{#include <vector>}
 \textcolor{preprocessor}{#include <iostream>}
+\textcolor{preprocessor}{#include <stdexcept>}
 \textcolor{preprocessor}{#include "opt.h"}
 
 \textcolor{comment}{// Single-variable f(x) = x^2}
@@ -46,17 +47,27 @@ Currently implemented are the basic Barzilai-\/\+Borwein gradient descent method
     \textcolor{keywordflow}{return} ans;
 \}
 
+\textcolor{comment}{// Rosenbrock function}
+\textcolor{keywordtype}{double} rosenbrock(std::vector<double> x)
+\{
+    \textcolor{keywordflow}{if} (x.size() != 2)
+        std::runtime\_error::runtime\_error(\textcolor{stringliteral}{"rosenbrock function only takes 2D vectors as input"});
+
+    \textcolor{keywordflow}{return} (1 - x[0])*(1 - x[0]) + 100.0*(x[1] - x[0] * x[0])*(x[1] - x[0] * x[0]);
+\}
+
 \textcolor{keywordtype}{int} main()
 \{
     \textcolor{comment}{// Single-variable problem parameters:}
     \textcolor{keywordtype}{double} x0 = 8.;
     \textcolor{keywordtype}{double} x0\_init = x0;
 
-    \textcolor{comment}{// Call the single-variable gradient descent optimizer on the x^2 function:}
+    \textcolor{comment}{/*** Call the single-variable gradient descent optimizer on the x^2 function: ***/}
     \textcolor{keywordtype}{double} gdval = \mbox{\hyperlink{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}{opt::gradientDescent}}(x2, x0);
 
     \textcolor{comment}{// Output results:}
-    std::cout << \textcolor{stringliteral}{"Solution for min val of f(x) = x^2 with guess x0 = "} << x0\_init << \textcolor{stringliteral}{":"} << std::endl;
+    std::cout << \textcolor{stringliteral}{"Solution for min val of f(x) = x^2 with initial guess x0 = "} << x0\_init << \textcolor{stringliteral}{":"} << 
+      std::endl;
     std::cout <<  \textcolor{stringliteral}{"\(\backslash\)tMinimum = "} << gdval << \textcolor{stringliteral}{", x\_min = "} << x0 << std::endl;
 
     std::cout << std::endl;
@@ -65,33 +76,50 @@ Currently implemented are the basic Barzilai-\/\+Borwein gradient descent method
     std::vector<double> X0 = \{ 4.,4. \};
     std::vector<double> X0\_init = X0;
 
-    \textcolor{comment}{// Call the multi-variable gradient descent optimizer on the |x|^2 function:}
+    \textcolor{comment}{/*** Call the multi-variable gradient descent optimizer on the |x|^2 function: ***/}
     gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(x2\_Xd, X0);
 
     \textcolor{comment}{// Output results:}
-    std::cout << \textcolor{stringliteral}{"Solution for min val of f(x) = |x|^2 with guess X0 = ["} << X0\_init[0] << \textcolor{stringliteral}{", "} << X0\_init[
-      1] << \textcolor{stringliteral}{"]:"} << std::endl;
+    std::cout << \textcolor{stringliteral}{"Solution for min val of f(x) = |x|^2 with initial guess X0 = ["} << X0\_init[0] << \textcolor{stringliteral}{", "} << 
+      X0\_init[1] << \textcolor{stringliteral}{"]:"} << std::endl;
     std::cout << \textcolor{stringliteral}{"\(\backslash\)tMinimum = "} << gdval << \textcolor{stringliteral}{", x\_min = ["} << X0[0] << \textcolor{stringliteral}{", "} << X0[1] << \textcolor{stringliteral}{"]"} << std::endl;
 
+    std::cout << std::endl;
+
+    \textcolor{comment}{// Re-initialize parameters for rosenbrock opt problem}
+    X0 = \{-0.5, 0.5\};
+    X0\_init = X0;
+
+    \textcolor{comment}{/*** Call the multi-variable gradient descent optimizer on the Rosenbrock function: ***/}
+    gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(rosenbrock, X0);
+
+    \textcolor{comment}{// Output results:}
+    std::cout << \textcolor{stringliteral}{"Solution for min val of rosenbrock(x) with initial guess X0 = ["} << X0\_init[0] << \textcolor{stringliteral}{", "} <<
+       X0\_init[1] << \textcolor{stringliteral}{"]:"} << std::endl;
+    std::cout << \textcolor{stringliteral}{"\(\backslash\)tMinimum = "} << gdval << \textcolor{stringliteral}{", x\_min = ["} << X0[0] << \textcolor{stringliteral}{", "} << X0[1] << \textcolor{stringliteral}{"]"} << std::endl;
     std::cin.get();
     \textcolor{keywordflow}{return} 0;
 \}
 \end{DoxyCodeInclude}
  ~\newline
 ~\newline
- This program will output the following\+: ~\newline
+ This program, ran using VS compiler on a Windows 10 64-\/bit machine, output the following\+: ~\newline
  
 \begin{DoxyCode}
 Minimum converged in 2 iterations
-Solution for min val of f(x) = x^2 with guess x0 = 8:
+Solution for min val of f(x) = x^2 with initial guess x0 = 8:
     Minimum = 2.5e-15, x\_min = -5e-08
 
 Minimum converged in 2 iterations
-Solution for min val of f(x) = |x|^2 with guess X0 = [4, 4]:
+Solution for min val of f(x) = |x|^2 with initial guess X0 = [4, 4]:
     Minimum = 5e-15, x\_min = [-5e-08, -5e-08]
+
+Minimum converged in 38 iterations
+Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
+    Minimum = 5.50167e-05, x\_min = [0.992589, 0.985202]
 \end{DoxyCode}
  \begin{DoxyRefDesc}{Todo}
-\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Up next\+: gradient\+Descent\+\_\+\+X\+Xd() -- gradient descent method for linear systems $Ax=b$ \end{DoxyRefDesc}
+\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Up next\+: gradient\+Descent\+\_\+\+X\+Xd() -- gradient descent method for over-\/determined linear systems $Ax=b$ \end{DoxyRefDesc}
 
 
 \subsection{Function Documentation}
@@ -107,7 +135,7 @@ Compute a local minimum near initial guess of real-\/valued function.
 
 This function implements the Barzilai-\/\+Borwein gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for a general single variable real-\/valued function. 
 \begin{DoxyParams}{Parameters}
-{\em f} & {\bfseries (std\+::function$<$double(double)$>$)} real-\/valued function $f:R\longrightarrow R$ to find the local minimum nearest initial guess $x_0$ \\
+{\em f} & {\bfseries (std\+::function$<$double(double)$>$)} real-\/valued function $f:R\longrightarrow R$ to find the local minimum nearest initial guess $x_0$. $f$ is a function that has {\bfseries double} arg type, and {\bfseries double} as return type. \\
 \hline
 {\em x0} & {\bfseries (double\&)} Initial guess of gradient descent optimization problem; this parameter is updated with the optimized $x-$value prior to exiting. \\
 \hline
@@ -117,7 +145,7 @@ This function implements the Barzilai-\/\+Borwein gradient descent method ({\its
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-$f(x_n)$ {\bfseries (double)} local minimum of $f$ in well of $x_0$ 
+$f(x_{opt})$ {\bfseries (double)} local minimum of $f$ in well of $x_0$ 
 \end{DoxyReturn}
 \mbox{\Hypertarget{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}\label{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}} 
 \index{opt@{opt}!gradient\+Descent\+\_\+\+Xd@{gradient\+Descent\+\_\+\+Xd}}
@@ -131,7 +159,7 @@ Compute a local minimum near initial guess of real-\/valued function.
 
 This function implements the Barzilai-\/\+Borwein gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for a general multi-\/variate real-\/valued function. 
 \begin{DoxyParams}{Parameters}
-{\em f} & {\bfseries (std\+::function$<$double(std\+::vector$<$double$>$)$>$)} real-\/valued function $ f:R^d\longrightarrow R$ to find the local minimum nearest initial guess $x_0$ \\
+{\em f} & {\bfseries (std\+::function$<$double(std\+::vector$<$double$>$)$>$)} real-\/valued function $ f:R^d\longrightarrow R$ to find the local minimum nearest initial guess $x_0$. $f$ is a function that has {\bfseries std\+::vector$<$double$>$} arg type, and {\bfseries double} as return type. \\
 \hline
 {\em x0} & {\bfseries (double\&)} Initial guess of gradient descent optimization problem; this parameter is updated with the optimized $x-$value prior to exiting. \\
 \hline
@@ -141,5 +169,5 @@ This function implements the Barzilai-\/\+Borwein gradient descent method ({\its
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-$f(x_n)$ {\bfseries (double)} local minimum of $f$ in well of $x_0$ 
+$f(x_{opt})$ {\bfseries (double)} local minimum of $f$ in well of $x_0$ 
 \end{DoxyReturn}

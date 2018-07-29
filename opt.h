@@ -5,7 +5,8 @@
 #include <string>
 #include <stdexcept>
 
-#pragma once
+#ifndef __OPT_H__
+#define __OPT_H__
 
 //! Optimization namespace containing various optimization algorithms
 /*!
@@ -30,18 +31,22 @@
 	<br/>
 	\include maintest.cpp
 	<br/><br/>
-	This program will output the following:
+	This program, ran using VS compiler on a Windows 10 64-bit machine, output the following:
 	<br/>
 	\code{.unparsed}
 	Minimum converged in 2 iterations
-	Solution for min val of f(x) = x^2 with guess x0 = 8:
+	Solution for min val of f(x) = x^2 with initial guess x0 = 8:
 		Minimum = 2.5e-15, x_min = -5e-08
 
 	Minimum converged in 2 iterations
-	Solution for min val of f(x) = |x|^2 with guess X0 = [4, 4]:
+	Solution for min val of f(x) = |x|^2 with initial guess X0 = [4, 4]:
 		Minimum = 5e-15, x_min = [-5e-08, -5e-08]
+
+	Minimum converged in 38 iterations
+	Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
+		Minimum = 5.50167e-05, x_min = [0.992589, 0.985202]
 	\endcode
-	\todo Up next: gradientDescent_XXd() -- gradient descent method for linear systems \f$Ax=b\f$
+	\todo Up next: gradientDescent_XXd() -- gradient descent method for over-determined linear systems \f$Ax=b\f$
 */
 namespace opt {
 
@@ -69,7 +74,7 @@ namespace opt {
 		double vectDot(std::vector<double> x1, const std::vector<double> x2)
 		{
 			if (x1.size() != x2.size())
-				std::runtime_error::runtime_error("std::vector<double> operator- only defined for vectors of equal size!\n");
+				std::runtime_error::runtime_error("std::vector<double> dot product only defined for vectors of equal size!\n");
 			size_t N = x1.size();
 			double ans = 0.;
 			for (size_t i = 0; i < N; i++)
@@ -100,11 +105,11 @@ namespace opt {
 	//! Compute a local minimum near initial guess of real-valued function
 	/*!
 	This function implements the Barzilai-Borwein gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) for a general single variable real-valued function.
-	\param f <b>(std::function<double(double)>)</b> real-valued function \f$f:R\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$
+	\param f <b>(std::function<double(double)>)</b> real-valued function \f$f:R\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$. \f$f\f$ is a function that has <b>double</b> arg type, and <b>double</b> as return type.
 	\param x0 <b>(double&)</b> Initial guess of gradient descent optimization problem; this parameter is updated with the optimized \f$x-\f$value prior to exiting.
 	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for error in the function evaluations
 	\param verbose <b>(bool)</b> by default true, if set to true then the optimizer will echo to stdout number of iterations performed
-	\return \f$f(x_n)\f$ <b>(double)</b> local minimum of \f$f\f$ in well of \f$x_0\f$
+	\return \f$f(x_{opt})\f$ <b>(double)</b> local minimum of \f$f\f$ in well of \f$x_0\f$
 	*/
 	double gradientDescent(std::function<double(double)>f, double& x0, double tol = 1.e-6, bool verbose = true)
 	{
@@ -139,11 +144,11 @@ namespace opt {
 	//! Compute a local minimum near initial guess of real-valued function
 	/*!
 	This function implements the Barzilai-Borwein gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) for a general multi-variate real-valued function.
-	\param f <b>(std::function<double(std::vector<double>)>)</b> real-valued function \f$ f:R^d\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$
+	\param f <b>(std::function<double(std::vector<double>)>)</b> real-valued function \f$ f:R^d\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$. \f$f\f$ is a function that has <b>std::vector<double></b> arg type, and <b>double</b> as return type.
 	\param x0 <b>(double&)</b> Initial guess of gradient descent optimization problem; this parameter is updated with the optimized \f$x-\f$value prior to exiting.
 	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for error in the function evaluations
 	\param verbose <b>(bool)</b> by default true, if set to true then the optimizer will echo to stdout number of iterations performed
-	\return \f$f(x_n)\f$ <b>(double)</b> local minimum of \f$f\f$ in well of \f$x_0\f$
+	\return \f$f(x_{opt})\f$ <b>(double)</b> local minimum of \f$f\f$ in well of \f$x_0\f$
 	*/
 	double gradientDescent_Xd(std::function<double(std::vector<double>)>f, std::vector<double>& x0, double tol = 1.e-6, bool verbose = true)
 	{
@@ -181,3 +186,4 @@ namespace opt {
 		return f(x_n);
 	};
 };
+#endif
