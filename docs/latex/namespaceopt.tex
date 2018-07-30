@@ -11,7 +11,9 @@ Optimization namespace containing various optimization algorithms.
 double \mbox{\hyperlink{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}{gradient\+Descent}} (std\+::function$<$ double(double)$>$f, double \&x0, double tol=1.e-\/6, bool verbose=true)
 \begin{DoxyCompactList}\small\item\em Compute a local minimum near initial guess of real-\/valued function. \end{DoxyCompactList}\item 
 double \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{gradient\+Descent\+\_\+\+Xd}} (std\+::function$<$ double(std\+::vector$<$ double $>$)$>$f, std\+::vector$<$ double $>$ \&x0, double tol=1.e-\/6, bool verbose=true)
-\begin{DoxyCompactList}\small\item\em Compute a local minimum near initial guess of real-\/valued function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Compute a local minimum near initial guess of real-\/valued function. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{namespaceopt_a8f434753958049daab7129ea247a97ff}{ncgd\+\_\+\+Xd}} (std\+::function$<$ double(std\+::vector$<$ double $>$)$>$f, std\+::vector$<$ double $>$ \&x0, double tol=1.e-\/6, bool verbose=true)
+\begin{DoxyCompactList}\small\item\em Nonlinear conjugate gradient descent algorithm of real-\/valued function. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
@@ -19,7 +21,9 @@ Optimization namespace containing various optimization algorithms.
 
 Currently implemented are the basic Barzilai-\/\+Borwein gradient descent methods ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for both scalar-\/valued functions of a single variable $f:R\longrightarrow R$ as well as scalar-\/valued functions of $d$ variables $ f:R^d\longrightarrow R$. ~\newline
 ~\newline
- The basic algorithm implements the following iterative method\+: \[ x_{n+1}=x_n-\gamma_n\nabla f(x_n), \] where \[ \gamma_n=\frac{(x_n-x_{n-1})\cdot\left[\nabla f(x_n)-\nabla f(x_{n-1})\right]}{\left|\nabla f(x_n)-\nabla f(x_{n-1})\right|^2} \] and $\nabla f$ is approximated with a simple finite-\/difference method using $\Delta x=\min(tol/10,\gamma_n/10)$, where $tol$ is a provided convergence tolerance. ~\newline
+ The gradient descent algorithms implement the following iterative method\+: \[ x_{n+1}=x_n-\gamma_n\nabla f(x_n), \] where \[ \gamma_n=\frac{(x_n-x_{n-1})\cdot\left[\nabla f(x_n)-\nabla f(x_{n-1})\right]}{\left|\nabla f(x_n)-\nabla f(x_{n-1})\right|^2} \] and $\nabla f$ is approximated with a simple finite-\/difference method using $\Delta x=\min(tol/10,\gamma_n/10)$, where $tol$ is a provided convergence tolerance. ~\newline
+~\newline
+ The nonlinear conjugate gradient method implements the algorithm outlined in the \href{https://en.wikipedia.org/wiki/Nonlinear_conjugate_gradient_method}{\tt Wikipedia article}, with the $\beta_n$ parameter coming from the Polak-\/\+Ribiere formula. Note that this implementation performs the line search step of the algorithm using lambda expressions, so that the library has an implicit dependency on the C++11 standard. ~\newline
 ~\newline
  For functions of $d$ variables, a {\bfseries std\+::vector$<$double$>$} container is assumed as the vector argument. ~\newline
 ~\newline
@@ -63,12 +67,9 @@ Currently implemented are the basic Barzilai-\/\+Borwein gradient descent method
     \textcolor{keywordtype}{double} x0\_init = x0;
 
     \textcolor{comment}{/*** Call the single-variable gradient descent optimizer on the x^2 function: ***/}
-    \textcolor{keywordtype}{double} gdval = \mbox{\hyperlink{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}{opt::gradientDescent}}(x2, x0);
-
-    \textcolor{comment}{// Output results:}
     std::cout << \textcolor{stringliteral}{"Solution for min val of f(x) = x^2 with initial guess x0 = "} << x0\_init << \textcolor{stringliteral}{":"} << 
       std::endl;
-    std::cout <<  \textcolor{stringliteral}{"\(\backslash\)tMinimum = "} << gdval << \textcolor{stringliteral}{", x\_min = "} << x0 << std::endl;
+    \textcolor{keywordtype}{double} gdval = \mbox{\hyperlink{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}{opt::gradientDescent}}(x2, x0);
 
     std::cout << std::endl;
 
@@ -77,12 +78,9 @@ Currently implemented are the basic Barzilai-\/\+Borwein gradient descent method
     std::vector<double> X0\_init = X0;
 
     \textcolor{comment}{/*** Call the multi-variable gradient descent optimizer on the |x|^2 function: ***/}
-    gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(x2\_Xd, X0);
-
-    \textcolor{comment}{// Output results:}
     std::cout << \textcolor{stringliteral}{"Solution for min val of f(x) = |x|^2 with initial guess X0 = ["} << X0\_init[0] << \textcolor{stringliteral}{", "} << 
       X0\_init[1] << \textcolor{stringliteral}{"]:"} << std::endl;
-    std::cout << \textcolor{stringliteral}{"\(\backslash\)tMinimum = "} << gdval << \textcolor{stringliteral}{", x\_min = ["} << X0[0] << \textcolor{stringliteral}{", "} << X0[1] << \textcolor{stringliteral}{"]"} << std::endl;
+    gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(x2\_Xd, X0);
 
     std::cout << std::endl;
 
@@ -91,12 +89,21 @@ Currently implemented are the basic Barzilai-\/\+Borwein gradient descent method
     X0\_init = X0;
 
     \textcolor{comment}{/*** Call the multi-variable gradient descent optimizer on the Rosenbrock function: ***/}
-    gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(rosenbrock, X0, 1.e-10);
-
-    \textcolor{comment}{// Output results:}
     std::cout << \textcolor{stringliteral}{"Solution for min val of rosenbrock(x) with initial guess X0 = ["} << X0\_init[0] << \textcolor{stringliteral}{", "} <<
        X0\_init[1] << \textcolor{stringliteral}{"]:"} << std::endl;
-    std::cout << \textcolor{stringliteral}{"\(\backslash\)tMinimum = "} << gdval << \textcolor{stringliteral}{", x\_min = ["} << X0[0] << \textcolor{stringliteral}{", "} << X0[1] << \textcolor{stringliteral}{"]"} << std::endl;
+    gdval = \mbox{\hyperlink{namespaceopt_a7db27c86e1c5a503b7f8373ba067d97b}{opt::gradientDescent\_Xd}}(rosenbrock, X0, 1.e-10);
+
+    std::cout << std::endl;
+
+    \textcolor{comment}{// Re-initialize parameters for rosenbrock opt problem with nonlinear conjugate gradient method}
+    X0 = \{ -0.5, 0.5 \};
+    X0\_init = X0;
+
+    \textcolor{comment}{/*** Call the nonlinear conjugate gradient optimizer on the Rosenbrock function: ***/}
+    std::cout << \textcolor{stringliteral}{"Solution for min val of rosenbrock(x) with initial guess X0 = ["} << X0\_init[0] << \textcolor{stringliteral}{", "} <<
+       X0\_init[1] << \textcolor{stringliteral}{"]:"} << std::endl;
+    gdval = \mbox{\hyperlink{namespaceopt_a8f434753958049daab7129ea247a97ff}{opt::ncgd\_Xd}}(rosenbrock, X0);
+
     std::cin.get();
     \textcolor{keywordflow}{return} 0;
 \}
@@ -117,10 +124,12 @@ Solution for min val of f(x) = |x|^2 with initial guess X0 = [4, 4]:
 Minimum converged in 55 iterations
 Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
     Minimum = 9.83781e-11, x\_min = [1, 1]
-\end{DoxyCode}
- \begin{DoxyRefDesc}{Todo}
-\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Up next\+: conj\+Gradient\+Descent\+\_\+\+X\+Xd() -- conjugate gradient descent method for symmetric positive-\/definite systems $Ax=b$ \end{DoxyRefDesc}
 
+Minimum converged in 20 iterations
+Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
+    Minimum = 1.97327e-12, x\_min = [1, 1]
+\end{DoxyCode}
+ 
 
 \subsection{Function Documentation}
 \mbox{\Hypertarget{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}\label{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}} 
@@ -133,7 +142,7 @@ Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
 
 Compute a local minimum near initial guess of real-\/valued function. 
 
-This function implements the Barzilai-\/\+Borwein gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for a general single variable real-\/valued function. 
+This function implements the unconstrained Barzilai-\/\+Borwein gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for a general single variable real-\/valued function. 
 \begin{DoxyParams}{Parameters}
 {\em f} & {\bfseries (std\+::function$<$double(double)$>$)} real-\/valued function $f:R\longrightarrow R$ to find the local minimum nearest initial guess $x_0$. $f$ is a function that has {\bfseries double} arg type, and {\bfseries double} as return type. \\
 \hline
@@ -157,7 +166,7 @@ $f(x_{opt})$ {\bfseries (double)} local minimum of $f$ in well of $x_0$
 
 Compute a local minimum near initial guess of real-\/valued function. 
 
-This function implements the Barzilai-\/\+Borwein gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for a general multi-\/variate real-\/valued function. 
+This function implements the unconstrained Barzilai-\/\+Borwein gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Gradient_descent}{\tt see Wikipedia\textquotesingle{}s \textquotesingle{}Gradient Descent\textquotesingle{} article}}) for a general multi-\/variate real-\/valued function. 
 \begin{DoxyParams}{Parameters}
 {\em f} & {\bfseries (std\+::function$<$double(std\+::vector$<$double$>$)$>$)} real-\/valued function $ f:R^d\longrightarrow R$ to find the local minimum nearest initial guess $x_0$. $f$ is a function that has {\bfseries std\+::vector$<$double$>$} arg type, and {\bfseries double} as return type. \\
 \hline
@@ -171,3 +180,29 @@ This function implements the Barzilai-\/\+Borwein gradient descent method ({\its
 \begin{DoxyReturn}{Returns}
 $f(x_{opt})$ {\bfseries (double)} local minimum of $f$ in well of $x_0$ 
 \end{DoxyReturn}
+\mbox{\Hypertarget{namespaceopt_a8f434753958049daab7129ea247a97ff}\label{namespaceopt_a8f434753958049daab7129ea247a97ff}} 
+\index{opt@{opt}!ncgd\+\_\+\+Xd@{ncgd\+\_\+\+Xd}}
+\index{ncgd\+\_\+\+Xd@{ncgd\+\_\+\+Xd}!opt@{opt}}
+\subsubsection{\texorpdfstring{ncgd\+\_\+\+Xd()}{ncgd\_Xd()}}
+{\footnotesize\ttfamily double opt\+::ncgd\+\_\+\+Xd (\begin{DoxyParamCaption}\item[{std\+::function$<$ double(std\+::vector$<$ double $>$)$>$}]{f,  }\item[{std\+::vector$<$ double $>$ \&}]{x0,  }\item[{double}]{tol = {\ttfamily 1.e-\/6},  }\item[{bool}]{verbose = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Nonlinear conjugate gradient descent algorithm of real-\/valued function. 
+
+This function implements an unconstrained nonlinear conjugate gradient descent method ({\itshape \href{https://en.wikipedia.org/wiki/Nonlinear_conjugate_gradient_method}{\tt see Wikipedia\textquotesingle{}s article}}) for a general multi-\/variate real-\/valued function. The line search performed for updating the solution guess (see the $\alpha_n$ parameter in the Wikipedia article) uses the \mbox{\hyperlink{namespaceopt_af1ef2e32062af31429ae74fc07c57fb0}{opt\+::gradient\+Descent()}} method. $\beta_n$ is computed using the Polak-\/\+Ribiere formula, also found in the Wikipedia article. 
+\begin{DoxyParams}{Parameters}
+{\em f} & {\bfseries (std\+::function$<$double(std\+::vector$<$double$>$)$>$)} real-\/valued function $ f:R^d\longrightarrow R$ to find the local minimum nearest initial guess $x_0$. $f$ is a function that has {\bfseries std\+::vector$<$double$>$} arg type, and {\bfseries double} as return type. \\
+\hline
+{\em x0} & {\bfseries (double\&)} Initial guess of optimization problem; this parameter is updated with the optimized $x-$value prior to exiting. \\
+\hline
+{\em tol} & {\bfseries (double)} by default 1.\+0e-\/6, the convergence criterion for function gradient magnitude \\
+\hline
+{\em verbose} & {\bfseries (bool)} by default true, if set to true then the optimizer will echo to stdout number of iterations performed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$f(x_{opt})$ {\bfseries (double)} local minimum of $f$ in well of $x_0$ 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Allow for user options to be set, such as which formula to use for the $\beta_n$ calculations \end{DoxyRefDesc}

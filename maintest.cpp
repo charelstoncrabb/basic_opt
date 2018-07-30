@@ -35,11 +35,8 @@ int main()
 	double x0_init = x0;
 
 	/*** Call the single-variable gradient descent optimizer on the x^2 function: ***/
-	double gdval = opt::gradientDescent(x2, x0);
-
-	// Output results:
 	std::cout << "Solution for min val of f(x) = x^2 with initial guess x0 = " << x0_init << ":" << std::endl;
-	std::cout <<  "\tMinimum = " << gdval << ", x_min = " << x0 << std::endl;
+	double gdval = opt::gradientDescent(x2, x0);
 
 	std::cout << std::endl;
 
@@ -48,11 +45,8 @@ int main()
 	std::vector<double> X0_init = X0;
 
 	/*** Call the multi-variable gradient descent optimizer on the |x|^2 function: ***/
-	gdval = opt::gradientDescent_Xd(x2_Xd, X0);
-
-	// Output results:
 	std::cout << "Solution for min val of f(x) = |x|^2 with initial guess X0 = [" << X0_init[0] << ", " << X0_init[1] << "]:" << std::endl;
-	std::cout << "\tMinimum = " << gdval << ", x_min = [" << X0[0] << ", " << X0[1] << "]" << std::endl;
+	gdval = opt::gradientDescent_Xd(x2_Xd, X0);
 
 	std::cout << std::endl;
 
@@ -61,11 +55,19 @@ int main()
 	X0_init = X0;
 
 	/*** Call the multi-variable gradient descent optimizer on the Rosenbrock function: ***/
+	std::cout << "Solution for min val of rosenbrock(x) with initial guess X0 = [" << X0_init[0] << ", " << X0_init[1] << "]:" << std::endl;
 	gdval = opt::gradientDescent_Xd(rosenbrock, X0, 1.e-10);
 
-	// Output results:
+	std::cout << std::endl;
+
+	// Re-initialize parameters for rosenbrock opt problem with nonlinear conjugate gradient method
+	X0 = { -0.5, 0.5 };
+	X0_init = X0;
+
+	/*** Call the nonlinear conjugate gradient optimizer on the Rosenbrock function: ***/
 	std::cout << "Solution for min val of rosenbrock(x) with initial guess X0 = [" << X0_init[0] << ", " << X0_init[1] << "]:" << std::endl;
-	std::cout << "\tMinimum = " << gdval << ", x_min = [" << X0[0] << ", " << X0[1] << "]" << std::endl;
+	gdval = opt::ncgd_Xd(rosenbrock, X0);
+
 	std::cin.get();
 	return 0;
 }

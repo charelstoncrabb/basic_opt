@@ -14,7 +14,7 @@
 	(<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) 
 	for both scalar-valued functions of a single variable \f$f:R\longrightarrow R\f$ as well as scalar-valued functions of \f$d\f$ variables \f$ f:R^d\longrightarrow R\f$.
 	<br/><br/>
-	The basic algorithm implements the following iterative method:
+	The gradient descent algorithms implement the following iterative method:
 	\f[
 		x_{n+1}=x_n-\gamma_n\nabla f(x_n),
 	\f]
@@ -24,6 +24,10 @@
 	\f]
 	and
 	\f$\nabla f\f$ is approximated with a simple finite-difference method using \f$\Delta x=\min(tol/10,\gamma_n/10)\f$, where \f$tol\f$ is a provided convergence tolerance.
+	<br/><br/>
+	The nonlinear conjugate gradient method implements the algorithm outlined in the <A HREF="https://en.wikipedia.org/wiki/Nonlinear_conjugate_gradient_method">
+	Wikipedia article</A>, with the \f$\beta_n\f$ parameter coming from the Polak-Ribiere formula. Note that this implementation performs the line search step of
+	the algorithm using lambda expressions, so that the library has an implicit dependency on the C++11 standard.
 	<br/><br/>
 	For functions of \f$d\f$ variables, a <b>std::vector<double></b> container is assumed as the vector argument.
 	<br/><br/>
@@ -46,12 +50,25 @@
 	Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
         Minimum = 9.83781e-11, x_min = [1, 1]
 
+	Minimum converged in 20 iterations
+	Solution for min val of rosenbrock(x) with initial guess X0 = [-0.5, 0.5]:
+		Minimum = 1.97327e-12, x_min = [1, 1]
 	\endcode
-	\todo Up next: conjGradientDescent_XXd() -- conjugate gradient descent method for symmetric positive-definite systems \f$Ax=b\f$
 */
 namespace opt {
 
 	namespace __helpers {
+		std::vector<double> vectSum(std::vector<double> x1, const std::vector<double> x2)
+		{
+			if (x1.size() != x2.size())
+				std::runtime_error::runtime_error("std::vector<double> operator+ only defined for vectors of equal size!\n");
+			std::vector<double> ans = x1;
+			size_t N = x1.size();
+			for (size_t i = 0; i < N; i++)
+				ans[i] += x2[i];
+			return ans;
+		}
+
 		std::vector<double> vectMinus(std::vector<double> x1, const std::vector<double> x2)
 		{
 			if (x1.size() != x2.size())
@@ -105,7 +122,7 @@ namespace opt {
 
 	//! Compute a local minimum near initial guess of real-valued function
 	/*!
-	This function implements the Barzilai-Borwein gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) for a general single variable real-valued function.
+	This function implements the unconstrained Barzilai-Borwein gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) for a general single variable real-valued function.
 	\param f <b>(std::function<double(double)>)</b> real-valued function \f$f:R\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$. \f$f\f$ is a function that has <b>double</b> arg type, and <b>double</b> as return type.
 	\param x0 <b>(double&)</b> Initial guess of gradient descent optimization problem; this parameter is updated with the optimized \f$x-\f$value prior to exiting.
 	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for function derivative magnitude
@@ -137,14 +154,17 @@ namespace opt {
 			error = fabs(df_n);							// Update error based on new function evaluations
 			iterations++;								// Increment algorithm iteration count
 		}
-		if( verbose ) std::cout << "Minimum converged in " << iterations << " iterations" << std::endl;
 		x0 = x_n;
-		return f(x_n);
+		if (verbose) {
+			std::cout << "Minimum converged in " << iterations << " iterations" << std::endl;
+			std::cout << "\tMinimum = " << f(x_n) << ", x_min = " << x0 << std::endl;
+		}
+		return f(x0);
 	};
 
 	//! Compute a local minimum near initial guess of real-valued function
 	/*!
-	This function implements the Barzilai-Borwein gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) for a general multi-variate real-valued function.
+	This function implements the unconstrained Barzilai-Borwein gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Gradient_descent">see Wikipedia's 'Gradient Descent' article</A></em>) for a general multi-variate real-valued function.
 	\param f <b>(std::function<double(std::vector<double>)>)</b> real-valued function \f$ f:R^d\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$. \f$f\f$ is a function that has <b>std::vector<double></b> arg type, and <b>double</b> as return type.
 	\param x0 <b>(double&)</b> Initial guess of gradient descent optimization problem; this parameter is updated with the optimized \f$x-\f$value prior to exiting.
 	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for function gradient magnitude
@@ -182,9 +202,95 @@ namespace opt {
 			error = fabs(__helpers::vectDot(df_n, df_n));	// Update error based on new function evaluations
 			iterations++;									// Increment algorithm iteration count
 		}
-		if( verbose ) std::cout << "Minimum converged in " << iterations << " iterations" << std::endl;
 		x0 = x_n;
-		return f(x_n);
+		if (verbose) {
+			std::cout << "Minimum converged in " << iterations << " iterations" << std::endl;
+			std::cout << "\tMinimum = " << f(x_n) << ", x_min = [";
+			for (size_t i = 0; i < x0.size() - 1; i++)
+				std::cout << x0[i] << ", ";
+			std::cout << x0[x0.size() - 1] << "]" << std::endl;
+		}
+		return f(x0);
+	};
+
+	//! Nonlinear conjugate gradient descent algorithm of real-valued function
+	/*!
+	This function implements an unconstrained nonlinear conjugate gradient descent method (<em><A HREF="https://en.wikipedia.org/wiki/Nonlinear_conjugate_gradient_method">see Wikipedia's article</A></em>) for a general multi-variate real-valued function. The line search performed for updating the solution guess (see the \f$\alpha_n\f$ parameter in the Wikipedia article) uses the opt::gradientDescent() method. \f$\beta_n\f$ is computed using the Polak-Ribiere formula, also found in the Wikipedia article.
+	\param f <b>(std::function<double(std::vector<double>)>)</b> real-valued function \f$ f:R^d\longrightarrow R\f$ to find the local minimum nearest initial guess \f$x_0\f$. \f$f\f$ is a function that has <b>std::vector<double></b> arg type, and <b>double</b> as return type.
+	\param x0 <b>(double&)</b> Initial guess of optimization problem; this parameter is updated with the optimized \f$x-\f$value prior to exiting.
+	\param tol <b>(double)</b> by default 1.0e-6, the convergence criterion for function gradient magnitude
+	\param verbose <b>(bool)</b> by default true, if set to true then the optimizer will echo to stdout number of iterations performed
+	\return \f$f(x_{opt})\f$ <b>(double)</b> local minimum of \f$f\f$ in well of \f$x_0\f$
+	\todo Allow for user options to be set, such as which formula to use for the \f$\beta_n\f$ calculations
+	*/
+	double ncgd_Xd(std::function<double(std::vector<double>)>f, std::vector<double>& x0, double tol = 1.e-6, bool verbose = true)
+	{
+		std::vector<double>  
+			Deltax_n,			// Current step direction
+			Deltax_nm1,			// Previous step direction
+			s_n,				// Current conjugate direction
+			s_nm1,				// Previous conjugate direction
+			x_n = x0,			// Current solution guess
+			x_np1 = x0;			// Previous solution guess
+		double 
+			error = tol + 1.,	// Current error metric
+			dx = tol / 10.,		// Spatial step size for computing gradient
+			alpha_n = 0.0,		// Optimized line step
+			beta_n = 0.0,		// Conjugate direction update scalar
+			linesearch;			// Placeholder variable for result of line search
+		size_t iterations = 0;	// Number of iterations performed
+
+		Deltax_n = __helpers::vectScale(-1.0,					// Update Deltax_n with (negative) gradient of f
+			__helpers::grad_Xd(f, x0, dx));
+		s_n = Deltax_n;											// Use beta_n = 0 for first iteration
+		linesearch = gradientDescent(							// perform line search using gradientDescent, updates alpha_n by reference
+			[f, x_n, s_n](double alpha) mutable { return f(__helpers::vectSum(x_n, __helpers::vectScale(alpha, s_n))); },
+			alpha_n,tol,false);
+		x_np1 = __helpers::vectSum(x_n,							// Update next x_{n+1}
+			__helpers::vectScale(alpha_n,s_n));
+		Deltax_nm1 = Deltax_n;									// Update previous step values
+		s_nm1 = s_n;
+		error = fabs(__helpers::vectDot(Deltax_n, Deltax_n));	// Update error based on new function evaluations
+		iterations++;											// Increment algorithm iteration count
+
+		while (error > tol)
+		{
+			Deltax_n = __helpers::vectScale(-1.0,					// Update Deltax_n with (negative) gradient of f
+				__helpers::grad_Xd(f, x_n, dx));
+
+			beta_n =												// Update beta_n via Polak-Ribiere formula
+				__helpers::vectDot(Deltax_n,
+					__helpers::vectMinus(Deltax_n, Deltax_nm1)) /
+				__helpers::vectDot(Deltax_nm1, Deltax_nm1);
+
+			s_n = __helpers::vectSum(Deltax_n,						// Update conjugate direction
+				__helpers::vectScale(beta_n,s_nm1));
+
+			alpha_n = 0.;											// reset alpha_n from previous iteration
+			linesearch = gradientDescent(							// perform line search using gradientDescent, updates alpha_n by reference
+				[f, x_n, s_n](double alpha) mutable { return f(__helpers::vectSum(x_n, __helpers::vectScale(alpha, s_n))); },
+				alpha_n, tol, false);
+
+			x_np1 = __helpers::vectSum(x_n,							// Update next x_{n+1}
+				__helpers::vectScale(alpha_n, s_n));
+
+			Deltax_nm1 = Deltax_n;									// Update previous step values
+			s_nm1 = s_n;
+			x_n = x_np1;
+			dx = fmin(tol / 10., alpha_n / 10.);					// Update dx based on new spatial step value
+
+			error = fabs(__helpers::vectDot(Deltax_n, Deltax_n));	// Update error based on new function evaluations
+			iterations++;											// Increment algorithm iteration count
+		}
+		x0 = x_n;
+		if (verbose) {
+			std::cout << "Minimum converged in " << iterations << " iterations" << std::endl;
+			std::cout << "\tMinimum = " << f(x_n) << ", x_min = [";
+			for(size_t i = 0; i < x0.size()-1;i++)
+				std::cout << x0[i] <<", ";
+			std::cout << x0[x0.size() - 1] << "]" << std::endl;
+		}
+		return f(x0);
 	};
 };
 #endif
