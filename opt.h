@@ -222,6 +222,7 @@ namespace opt {
 	\param verbose <b>(bool)</b> by default true, if set to true then the optimizer will echo to stdout number of iterations performed
 	\return \f$f(x_{opt})\f$ <b>(double)</b> local minimum of \f$f\f$ in well of \f$x_0\f$
 	\todo Allow for user options to be set, such as which formula to use for the \f$\beta_n\f$ calculations
+	\todo Solutions for example problems seem to go 'nan' if tolerance is set any lower than 1.e-6; need to investigate
 	*/
 	double ncgd_Xd(std::function<double(std::vector<double>)>f, std::vector<double>& x0, double tol = 1.e-6, bool verbose = true)
 	{
@@ -239,48 +240,74 @@ namespace opt {
 			beta_n = 0.0,		// Conjugate direction update scalar
 			linesearch;			// Placeholder variable for result of line search
 		size_t iterations = 0;	// Number of iterations performed
-
-		Deltax_n = __helpers::vectScale(-1.0,					// Update Deltax_n with (negative) gradient of f
+		
+		// Update Deltax_n with (negative) gradient of f
+		Deltax_n = __helpers::vectScale(-1.0,					
 			__helpers::grad_Xd(f, x0, dx));
-		s_n = Deltax_n;											// Use beta_n = 0 for first iteration
-		linesearch = gradientDescent(							// perform line search using gradientDescent, updates alpha_n by reference
+
+		// Use beta_n = 0 for first iteration
+		s_n = Deltax_n;
+
+		// perform line search using gradientDescent, updates alpha_n by reference
+		linesearch = gradientDescent(							
 			[f, x_n, s_n](double alpha) mutable { return f(__helpers::vectSum(x_n, __helpers::vectScale(alpha, s_n))); },
 			alpha_n,tol,false);
-		x_np1 = __helpers::vectSum(x_n,							// Update next x_{n+1}
+
+		// Update next x_{n+1}
+		x_np1 = __helpers::vectSum(x_n,							
 			__helpers::vectScale(alpha_n,s_n));
-		Deltax_nm1 = Deltax_n;									// Update previous step values
+
+		// Update previous step values
+		Deltax_nm1 = Deltax_n;									
 		s_nm1 = s_n;
-		error = fabs(__helpers::vectDot(Deltax_n, Deltax_n));	// Update error based on new function evaluations
-		iterations++;											// Increment algorithm iteration count
+
+		// Update error based on new function evaluations
+		error = fabs(__helpers::vectDot(Deltax_n, Deltax_n));	
+
+		// Increment algorithm iteration count
+		iterations++;											
 
 		while (error > tol)
 		{
-			Deltax_n = __helpers::vectScale(-1.0,					// Update Deltax_n with (negative) gradient of f
+			// Update Deltax_n with (negative) gradient of f
+			Deltax_n = __helpers::vectScale(-1.0,					
 				__helpers::grad_Xd(f, x_n, dx));
 
-			beta_n =												// Update beta_n via Polak-Ribiere formula
+			// Update beta_n via Polak-Ribiere formula
+			beta_n =												
 				__helpers::vectDot(Deltax_n,
 					__helpers::vectMinus(Deltax_n, Deltax_nm1)) /
 				__helpers::vectDot(Deltax_nm1, Deltax_nm1);
 
-			s_n = __helpers::vectSum(Deltax_n,						// Update conjugate direction
+			// Update conjugate direction
+			s_n = __helpers::vectSum(Deltax_n,						
 				__helpers::vectScale(beta_n,s_nm1));
 
-			alpha_n = 0.;											// reset alpha_n from previous iteration
-			linesearch = gradientDescent(							// perform line search using gradientDescent, updates alpha_n by reference
+			// reset alpha_n from previous iteration
+			alpha_n = 0.;											
+
+			// perform line search using gradientDescent, updates alpha_n by reference
+			linesearch = gradientDescent(							
 				[f, x_n, s_n](double alpha) mutable { return f(__helpers::vectSum(x_n, __helpers::vectScale(alpha, s_n))); },
 				alpha_n, tol, false);
 
-			x_np1 = __helpers::vectSum(x_n,							// Update next x_{n+1}
+			// Update next x_{n+1}
+			x_np1 = __helpers::vectSum(x_n,							
 				__helpers::vectScale(alpha_n, s_n));
 
-			Deltax_nm1 = Deltax_n;									// Update previous step values
+			// Update previous step values
+			Deltax_nm1 = Deltax_n;									
 			s_nm1 = s_n;
 			x_n = x_np1;
-			dx = fmin(tol / 10., alpha_n / 10.);					// Update dx based on new spatial step value
 
-			error = fabs(__helpers::vectDot(Deltax_n, Deltax_n));	// Update error based on new function evaluations
-			iterations++;											// Increment algorithm iteration count
+			// Update dx based on new spatial step value
+			dx = fmin(tol / 10., alpha_n / 10.);					
+
+			// Update error based on new function evaluations
+			error = fabs(__helpers::vectDot(Deltax_n, Deltax_n));	
+
+			// Increment algorithm iteration count
+			iterations++;											
 		}
 		x0 = x_n;
 		if (verbose) {
